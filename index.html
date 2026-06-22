@@ -807,9 +807,10 @@ DOCUMENT_TEXT:
 ${activeDoc.textContext}
 """`;
 
-            // Map history to official Gemini roles
+            // Map history to official Gemini roles 
+            // FIX: We MUST slice an EVEN number (like -4) so the sequence always starts with 'user', never 'model'.
             const contents = [];
-            const recentHistory = AppState.chatHistory.slice(-3);
+            const recentHistory = AppState.chatHistory.slice(-4);
             for (const msg of recentHistory) {
                 contents.push({
                     role: msg.role === 'ai' ? 'model' : 'user',
@@ -850,9 +851,9 @@ ${activeDoc.textContext}
 
             } catch (err) {
                 document.getElementById('temp-loader')?.remove();
-                console.error(err);
+                console.error("API Error: ", err);
                 // Graceful degradation / generic error to user
-                addMessage("Error connecting to AI. Please check your API key in settings or try again.", "ai");
+                addMessage("Error connecting to AI. The system formatting might have failed. Please check the console for details.", "ai");
             }
         }
 
