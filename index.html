@@ -328,9 +328,12 @@
             .smart-panel { display: none; } /* Hide smart panel on smaller screens, could be a tab */
         }
         @media (max-width: 900px) {
-            .app-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
-            .left-sidebar { display: none; }
-            .right-sidebar { display: none; }
+            body { overflow: auto; height: auto; min-height: 100vh; }
+            .app-container { display: flex; flex-direction: column; height: auto; }
+            .left-sidebar { min-height: 300px; }
+            .center-workspace { min-height: 60vh; }
+            .right-sidebar { min-height: 500px; }
+            .pdf-container { border-right: none; }
         }
         
         /* Utility */
@@ -397,7 +400,7 @@
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border-color)" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <p>Upload a PDF to begin</p>
                     </div>
-                    <object id="pdfViewer" data="" type="application/pdf" class="hidden"></object>
+                    <iframe id="pdfViewer" src="" class="hidden" style="width:100%; height:100%; border:none;"></iframe>
                 </div>
 
                 <!-- Smart Details & Notes -->
@@ -597,7 +600,7 @@
                 DOM.currentDocTitle.textContent = doc.name;
                 DOM.pdfEmptyState.classList.add('hidden');
                 DOM.pdfViewer.classList.remove('hidden');
-                DOM.pdfViewer.data = doc.fileUrl;
+                DOM.pdfViewer.src = doc.fileUrl;
                 DOM.stickyNotes.value = doc.notes || '';
                 
                 // Trigger Smart Analysis on the text
@@ -617,7 +620,7 @@
                 DOM.currentDocTitle.textContent = 'Workspace';
                 DOM.pdfEmptyState.classList.remove('hidden');
                 DOM.pdfViewer.classList.add('hidden');
-                DOM.pdfViewer.data = '';
+                DOM.pdfViewer.src = '';
                 DOM.stickyNotes.value = '';
                 DOM.datesContainer.innerHTML = '<div class="data-row"><span class="data-label">No document loaded</span></div>';
                 DOM.financialContainer.innerHTML = '<div class="data-row"><span class="data-label">No data</span></div>';
