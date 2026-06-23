@@ -1,17 +1,18 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UAE Smart Notebook</title>
-    <!-- PDF.js CDN for real text extraction without build tools -->
+    <!-- PDF.js CDN for real text extraction -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
     <style>
         :root {
-            /* Archivex Inspired Palette */
+            var(--bg): #0f1117;
             --bg: #0f1117;
             --card-bg: rgba(22, 27, 34, 0.65);
             --card-solid: #161b22;
@@ -41,7 +42,7 @@
             height: 100vh;
             width: 100vw;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* For desktop */
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(0, 208, 132, 0.03), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(0, 208, 132, 0.02), transparent 25%);
@@ -130,43 +131,21 @@
 
         /* --- Left Sidebar --- */
         .left-sidebar { padding: 1.5rem; }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-        }
+        .brand { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
         .brand-icon {
-            width: 32px; height: 32px;
-            background: var(--accent);
-            border-radius: 8px;
+            width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
             color: #000; font-weight: bold; font-size: 1.2rem;
         }
         .search-box { margin-bottom: 1.5rem; position: relative; }
-        .doc-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            min-height: 0;
-        }
+        .doc-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; min-height: 0; }
         .doc-item {
-            padding: 0.75rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: var(--transition);
+            padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid transparent;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: var(--transition);
         }
         .doc-item:hover { background: rgba(255,255,255,0.03); }
-        .doc-item.active {
-            background: rgba(0, 208, 132, 0.1);
-            border-color: rgba(0, 208, 132, 0.3);
-        }
+        .doc-item.active { background: rgba(0, 208, 132, 0.1); border-color: rgba(0, 208, 132, 0.3); }
         .doc-info { display: flex; flex-direction: column; gap: 0.2rem; overflow: hidden; }
         .doc-name { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .doc-meta { font-size: 0.75rem; color: var(--text-muted); }
@@ -174,176 +153,93 @@
 
         /* --- Center Workspace --- */
         .workspace-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .workspace-content {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-            min-height: 0;
-        }
-        .pdf-container {
-            flex: 2;
-            height: 100%;
-            border-right: 1px solid var(--border-color);
-            background: #2a2a2a; 
-            position: relative;
-        }
+        .workspace-content { flex: 1; display: flex; overflow: hidden; position: relative; min-height: 0; }
+        .pdf-container { flex: 2; height: 100%; border-right: 1px solid var(--border-color); background: #2a2a2a; position: relative; }
         .empty-state {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: var(--text-muted); gap: 1rem;
         }
         
-        /* Smart Features Panel */
-        .smart-panel {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            min-width: 300px;
-        }
-        .smart-card {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-        }
+        .smart-panel { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; min-width: 300px; }
+        .smart-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; }
         .smart-card h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .data-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; align-items: center;}
         .data-label { color: var(--text-muted); }
         .data-value { font-weight: 500; text-align: right; }
         
-        /* Status Tags */
         .tag { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
         .tag-green { background: rgba(0, 208, 132, 0.2); color: var(--accent); }
         .tag-orange { background: rgba(250, 173, 20, 0.2); color: var(--warning); }
         .tag-red { background: rgba(255, 77, 79, 0.2); color: var(--danger); }
 
-        /* Notes Area */
-        .notes-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .notes-area textarea {
-            flex: 1;
-            resize: none;
-            background: #fff8dc11; 
-            border: 1px dashed var(--border-color);
-            font-family: 'Courier New', Courier, monospace;
-        }
+        .notes-area { flex: 1; display: flex; flex-direction: column; }
+        .notes-area textarea { flex: 1; resize: none; background: #fff8dc11; border: 1px dashed var(--border-color); font-family: 'Courier New', Courier, monospace; }
 
         /* --- Right Sidebar (AI Chat) --- */
-        .chat-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .token-indicator {
-            font-size: 0.75rem; color: var(--text-muted);
-            display: flex; align-items: center; gap: 0.4rem;
-        }
+        .chat-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .token-indicator { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
         .status-dot.connected { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
         
-        .chat-messages {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            min-height: 0;
-        }
-        .msg {
-            max-width: 85%;
-            padding: 0.85rem 1.1rem;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease;
-            word-wrap: break-word;
-        }
+        .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; min-height: 0; }
+        .msg { max-width: 85%; padding: 0.85rem 1.1rem; border-radius: 14px; font-size: 0.95rem; line-height: 1.4; animation: fadeIn 0.3s ease; word-wrap: break-word; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .msg-user {
-            background: rgba(0, 208, 132, 0.15);
-            border: 1px solid rgba(0, 208, 132, 0.3);
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-        .msg-ai {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
+        .msg-user { background: rgba(0, 208, 132, 0.15); border: 1px solid rgba(0, 208, 132, 0.3); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-ai { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 4px; }
         
-        .chat-input-area {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex; flex-direction: column; gap: 0.75rem;
-        }
+        .chat-input-area { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; }
         .chips { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
-        .chip {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
-            padding: 0.4rem 0.8rem; border-radius: 16px; font-size: 0.8rem;
-            white-space: nowrap; cursor: pointer; color: var(--text-muted); transition: var(--transition);
-        }
+        .chip { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 16px; font-size: 0.8rem; white-space: nowrap; cursor: pointer; color: var(--text-muted); transition: var(--transition); }
         .chip:hover { background: rgba(0, 208, 132, 0.1); color: var(--accent); border-color: var(--accent); }
         
-        .input-group {
-            display: flex; gap: 0.5rem; position: relative;
-        }
+        .input-group { display: flex; gap: 0.5rem; position: relative; }
         .input-group input { padding-right: 3rem; }
-        .input-actions {
-            position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
-            display: flex; gap: 0.2rem;
-        }
+        .input-actions { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); display: flex; gap: 0.2rem; }
 
         /* --- Modals --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000; opacity: 0; pointer-events: none; transition: var(--transition);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: var(--transition); }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal {
-            background: var(--card-solid);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            width: 100%; max-width: 400px;
-            padding: 2rem;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
-            transform: scale(0.95); transition: var(--transition);
-        }
+        .modal { background: var(--card-solid); border: 1px solid var(--border-color); border-radius: var(--radius); width: 100%; max-width: 400px; padding: 2rem; box-shadow: 0 15px 50px rgba(0,0,0,0.5); transform: scale(0.95); transition: var(--transition); margin: 1rem; }
         .modal-overlay.active .modal { transform: scale(1); }
         .modal h2 { margin-bottom: 1.5rem; }
         .modal-form { display: flex; flex-direction: column; gap: 1rem; }
 
-        /* Responsive Breakpoints */
+        /* --- FIX: STRONG RESPONSIVE MOBILE & TABLET LAYOUT --- */
         @media (max-width: 1200px) {
-            .app-container { grid-template-columns: 240px 1fr 300px; padding: 1rem; }
-            .smart-panel { display: none; } 
-        }
-        @media (max-width: 900px) {
-            body { overflow: auto; height: auto; min-height: 100vh; }
-            .app-container { display: flex; flex-direction: column; height: auto; }
-            .left-sidebar { min-height: 300px; }
-            .center-workspace { min-height: 60vh; }
-            .right-sidebar { min-height: 500px; }
-            .pdf-container { border-right: none; }
+            .app-container { grid-template-columns: 240px 1fr; }
+            .smart-panel { display: none; } /* Hide extra panel on medium screens */
         }
         
-        /* Utility */
+        @media (max-width: 900px) {
+            /* On phones, completely ditch the grid and use flex stacking with scrolling */
+            body { 
+                overflow-y: auto; 
+                height: auto; 
+                min-height: 100vh; 
+            }
+            .app-container { 
+                display: flex; 
+                flex-direction: column; 
+                height: auto; 
+                padding: 0.75rem;
+                gap: 1rem;
+            }
+            .glass-panel { border-radius: 12px; }
+            
+            .left-sidebar { min-height: 250px; flex: none; }
+            
+            .center-workspace { min-height: 50vh; display: flex; flex-direction: column; }
+            .workspace-content { flex-direction: column; min-height: 400px; }
+            .pdf-container { width: 100%; height: 400px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .smart-panel { width: 100%; display: flex; }
+            
+            .right-sidebar { min-height: 600px; display: flex; flex-direction: column; }
+        }
+        
         .hidden { display: none !important; }
         .loader { width: 16px; height: 16px; border: 2px solid var(--text-muted); border-bottom-color: var(--accent); border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -390,7 +286,7 @@
             <div class="workspace-header">
                 <h3 id="currentDocTitle">Workspace</h3>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn-icon" onclick="exportData()" title="Export Notes & Chat (JSON/TXT)">
+                    <button class="btn-icon" onclick="exportData()" title="Export Notes & Chat">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     </button>
                     <button class="btn-icon" onclick="deleteCurrentDoc()" title="Delete Document">
@@ -413,21 +309,15 @@
                 <div class="smart-panel" id="smartPanel">
                     <div class="smart-card">
                         <h3>Important Dates</h3>
-                        <div id="datesContainer">
-                            <div class="data-row"><span class="data-label">No document loaded</span></div>
-                        </div>
+                        <div id="datesContainer"><div class="data-row"><span class="data-label">No document</span></div></div>
                     </div>
-
                     <div class="smart-card">
                         <h3>Financial Details</h3>
-                        <div id="financialContainer">
-                             <div class="data-row"><span class="data-label">No data</span></div>
-                        </div>
+                        <div id="financialContainer"><div class="data-row"><span class="data-label">No data</span></div></div>
                     </div>
-
                     <div class="notes-area">
-                        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase;">Sticky Notes</h3>
-                        <textarea id="stickyNotes" placeholder="Jot down quick thoughts here... (Auto-saves to browser memory)" oninput="saveNotes()"></textarea>
+                        <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">STICKY NOTES</h3>
+                        <textarea id="stickyNotes" placeholder="Jot down quick thoughts here..." oninput="saveNotes()"></textarea>
                     </div>
                 </div>
             </div>
@@ -447,7 +337,7 @@
             </div>
 
             <div class="chat-messages" id="chatBox">
-                <div class="msg msg-ai">Hello! I am your UAE Smart Notebook assistant. Connect your API key in Settings, upload a document, and ask me anything about it.</div>
+                <div class="msg msg-ai">Hello! Connect your API key in Settings, upload a document, and ask me anything about it.</div>
             </div>
 
             <div class="chat-input-area">
@@ -480,16 +370,16 @@
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Gemini API Key</label>
                     <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">For Vercel/GitHub pages, you must enter your free Google AI Studio API key here.</p>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">For Vercel/GitHub pages, enter your free Google AI Studio API key.</p>
                 </div>
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">AI Model Version</label>
                     <select id="modelSelect">
-                        <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash (Latest) - Default</option>
+                        <!-- FIX: Safest Google Cloud AI Studio model names -->
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable & Safe) - Default</option>
                         <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fast)</option>
-                        <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro (Advanced)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
                     </select>
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Select the model supported by your API key tier.</p>
                 </div>
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <button class="btn-primary" style="flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="closeSettings()">Cancel</button>
@@ -500,14 +390,13 @@
     </div>
 
     <script>
-        // STRICT ENVIRONMENT DETECTION
-        // If 'apiKey' is undefined, we are running on Vercel/GitHub. 
+        // Check for injected environment
         const isVercelEnvironment = typeof apiKey === 'undefined';
 
-        // App State with LocalStorage Persistence
+        // Fix: Default to stable 'gemini-1.5-flash' without '-latest' 
         const AppState = {
             apiKey: localStorage.getItem('gemini_api_key') || '',
-            modelName: localStorage.getItem('gemini_model') || 'gemini-1.5-flash-latest',
+            modelName: localStorage.getItem('gemini_model') || 'gemini-1.5-flash',
             documents: [],
             currentDocId: null,
             chatHistory: [],
@@ -539,23 +428,18 @@
 
         const SecurityChecks = {
             forbiddenRegex: /ignore previous|act as|system prompt|developer mode|unlimited mode|code|javascript|python|joke|funny|math|calculate|translate|history|news/i,
-            maxMessages: 20,
-            cooldownMs: 3000,
-            maxLength: 300
+            maxMessages: 20, cooldownMs: 3000, maxLength: 300
         };
 
         function init() {
-            // Determine active key
             const activeKey = isVercelEnvironment ? AppState.apiKey : '';
             if(isVercelEnvironment && !activeKey) {
-                // If on Vercel and no key in localStorage, force settings open
                 setTimeout(openSettings, 1000);
             } else {
                 DOM.connStatus.classList.add('connected');
             }
         }
 
-        // --- Document Processing via PDF.js ---
         DOM.fileUpload.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -564,14 +448,12 @@
             DOM.currentDocTitle.textContent = "Extracting text... Please wait.";
 
             try {
-                // 1. Convert to Base64 to bypass Vercel/iframe security blocks
                 const dataUrl = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (event) => resolve(event.target.result);
                     reader.readAsDataURL(file);
                 });
                 
-                // 2. Extract real text using PDF.js
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 
@@ -584,12 +466,9 @@
                 }
 
                 const newDoc = {
-                    id: docId,
-                    name: file.name,
-                    date: new Date().toLocaleDateString(),
-                    fileUrl: dataUrl,
-                    textContext: fullText || "No readable text found in PDF.",
-                    notes: localStorage.getItem(`notes_${docId}`) || '' // Support persistent notes
+                    id: docId, name: file.name, date: new Date().toLocaleDateString(),
+                    fileUrl: dataUrl, textContext: fullText || "No readable text found.",
+                    notes: localStorage.getItem(`notes_${docId}`) || ''
                 };
 
                 AppState.documents.push(newDoc);
@@ -597,11 +476,10 @@
                 renderDocList();
 
             } catch (error) {
-                console.error("PDF Processing Error: ", error);
+                console.error(error);
                 alert("Failed to read the text from this PDF. It might be corrupted or image-only.");
                 DOM.currentDocTitle.textContent = "Workspace";
             }
-            
             this.value = '';
         });
 
@@ -611,19 +489,12 @@
                 DOM.docList.appendChild(DOM.docEmptyState);
                 return;
             }
-
             DOM.docList.innerHTML = '';
             AppState.documents.forEach(doc => {
                 const el = document.createElement('div');
                 el.className = `doc-item ${doc.id === AppState.currentDocId ? 'active' : ''}`;
                 el.onclick = () => selectDocument(doc.id);
-                
-                el.innerHTML = `
-                    <div class="doc-info">
-                        <span class="doc-name" title="${doc.name}">${doc.name}</span>
-                        <span class="doc-meta">${doc.date}</span>
-                    </div>
-                `;
+                el.innerHTML = `<div class="doc-info"><span class="doc-name" title="${doc.name}">${doc.name}</span><span class="doc-meta">${doc.date}</span></div>`;
                 DOM.docList.appendChild(el);
             });
         }
@@ -631,17 +502,14 @@
         function selectDocument(id) {
             AppState.currentDocId = id;
             const doc = AppState.documents.find(d => d.id === id);
-            
             if (doc) {
                 DOM.currentDocTitle.textContent = doc.name;
                 DOM.pdfEmptyState.classList.add('hidden');
                 DOM.pdfViewer.classList.remove('hidden');
                 DOM.pdfViewer.src = doc.fileUrl;
                 
-                // Load LocalStorage notes
                 const savedNotes = localStorage.getItem(`notes_${doc.id}`);
                 DOM.stickyNotes.value = savedNotes !== null ? savedNotes : doc.notes;
-                
                 analyzeSmartData(doc.textContext);
             }
             renderDocList();
@@ -649,14 +517,11 @@
 
         function deleteCurrentDoc() {
             if(!AppState.currentDocId) return;
-            // Clean up localStorage for this doc
             localStorage.removeItem(`notes_${AppState.currentDocId}`);
-            
             AppState.documents = AppState.documents.filter(d => d.id !== AppState.currentDocId);
             
-            if(AppState.documents.length > 0) {
-                selectDocument(AppState.documents[0].id);
-            } else {
+            if(AppState.documents.length > 0) { selectDocument(AppState.documents[0].id); } 
+            else {
                 AppState.currentDocId = null;
                 DOM.currentDocTitle.textContent = 'Workspace';
                 DOM.pdfEmptyState.classList.remove('hidden');
@@ -669,54 +534,33 @@
             renderDocList();
         }
 
-        // --- Smart Data Extraction ---
         function analyzeSmartData(text) {
             const dateMatches = text.match(/\d{2}\/\d{2}\/\d{4}/g) || [];
             let datesHtml = '';
             if(dateMatches.length > 0) {
                 [...new Set(dateMatches)].forEach((dateStr, i) => {
-                    const status = getCountdownTag(dateStr);
-                    const label = i === 0 ? "Date Detected" : "Secondary Date";
-                    datesHtml += `
-                        <div class="data-row">
-                            <span class="data-label">${label}</span>
-                            <span class="data-value" style="display:flex; gap:0.5rem; align-items:center;">
-                                ${dateStr} ${status}
-                            </span>
-                        </div>`;
+                    const diffDays = getDays(dateStr);
+                    const tag = diffDays > 30 ? `tag-green">${diffDays}d left` : diffDays > 7 ? `tag-orange">${diffDays}d left` : `tag-red">${diffDays > 0 ? diffDays+'d left' : 'Expired'}`;
+                    datesHtml += `<div class="data-row"><span class="data-label">${i===0?"Primary Date":"Date"}</span><span class="data-value" style="display:flex;gap:0.5rem;align-items:center;">${dateStr} <span class="tag ${tag}</span></span></div>`;
                 });
-            } else {
-                datesHtml = '<div class="data-row"><span class="data-label">No dates found</span></div>';
-            }
+            } else { datesHtml = '<div class="data-row"><span class="data-label">No dates found</span></div>'; }
             DOM.datesContainer.innerHTML = datesHtml;
 
             const aedMatches = text.match(/AED\s[\d,.]+/g) || text.match(/[\d,.]+\sAED/g) || [];
             let finHtml = '';
             if(aedMatches.length > 0) {
                 [...new Set(aedMatches)].forEach((amt, i) => {
-                    const label = i === 0 ? "Primary Amount" : "Other Amount";
-                    finHtml += `
-                        <div class="data-row">
-                            <span class="data-label">${label}</span>
-                            <span class="data-value" style="color: var(--accent);">${amt}</span>
-                        </div>`;
+                    finHtml += `<div class="data-row"><span class="data-label">${i===0?"Primary Amount":"Other"}</span><span class="data-value" style="color: var(--accent);">${amt}</span></div>`;
                 });
-            } else {
-                finHtml = '<div class="data-row"><span class="data-label">No amounts found</span></div>';
-            }
+            } else { finHtml = '<div class="data-row"><span class="data-label">No amounts found</span></div>'; }
             DOM.financialContainer.innerHTML = finHtml;
         }
 
-        function getCountdownTag(dateStr) {
+        function getDays(dateStr) {
             const parts = dateStr.split('/');
-            if(parts.length !== 3) return '';
+            if(parts.length !== 3) return 0;
             const target = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-            const now = new Date();
-            const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-            
-            if(diffDays > 30) return `<span class="tag tag-green">${diffDays}d left</span>`;
-            if(diffDays > 7) return `<span class="tag tag-orange">${diffDays}d left</span>`;
-            return `<span class="tag tag-red">${diffDays > 0 ? diffDays+'d left' : 'Expired'}</span>`;
+            return Math.ceil((target - new Date()) / (1000 * 60 * 60 * 24));
         }
 
         function saveNotes() {
@@ -728,28 +572,17 @@
             }
         }
 
-        // --- AI Chatbot ---
-        function setQuery(text) {
-            DOM.chatInput.value = text;
-            DOM.chatInput.focus();
-        }
-
-        function handleEnter(e) {
-            if(e.key === 'Enter') sendMessage();
-        }
+        function setQuery(text) { DOM.chatInput.value = text; DOM.chatInput.focus(); }
+        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
 
         function addMessage(text, sender) {
             const el = document.createElement('div');
             el.className = `msg msg-${sender}`;
-            
             if(text === 'loader') {
-                el.innerHTML = '<span class="loader"></span>';
-                el.id = 'temp-loader';
+                el.innerHTML = '<span class="loader"></span>'; el.id = 'temp-loader';
             } else {
-                const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-                el.innerHTML = formatted;
+                el.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
             }
-            
             DOM.chatBox.appendChild(el);
             DOM.chatBox.scrollTop = DOM.chatBox.scrollHeight;
         }
@@ -761,37 +594,19 @@
             const activeKey = isVercelEnvironment ? AppState.apiKey : '';
             if(isVercelEnvironment && !activeKey) {
                 addMessage("Please connect your Gemini API key in settings first.", "ai");
-                setTimeout(openSettings, 1500);
-                return;
+                setTimeout(openSettings, 1500); return;
             }
 
             const activeDoc = AppState.documents.find(d => d.id === AppState.currentDocId);
             if(!activeDoc) {
-                addMessage("Please upload and select a PDF document first so I have something to read!", "ai");
-                return;
+                addMessage("Please upload and select a PDF document first!", "ai"); return;
             }
 
-            if (rawText.length > SecurityChecks.maxLength) {
-                addMessage("Message too long. Limit to 300 characters.", "ai");
-                return;
-            }
-
+            if (rawText.length > SecurityChecks.maxLength) { addMessage("Limit to 300 characters.", "ai"); return; }
             const now = Date.now();
-            if (now - AppState.lastMessageTime < SecurityChecks.cooldownMs) {
-                addMessage("Please wait a few seconds before asking another question.", "ai");
-                return;
-            }
-
-            if (AppState.messageCount >= SecurityChecks.maxMessages) {
-                addMessage("Session limit reached (20 msgs). Export your notes and refresh.", "ai");
-                return;
-            }
-
-            if (SecurityChecks.forbiddenRegex.test(rawText)) {
-                addMessage("Sorry, I only answer questions about your uploaded documents and this notebook.", "ai");
-                DOM.chatInput.value = '';
-                return;
-            }
+            if (now - AppState.lastMessageTime < SecurityChecks.cooldownMs) { addMessage("Wait a few seconds.", "ai"); return; }
+            if (AppState.messageCount >= SecurityChecks.maxMessages) { addMessage("Session limit reached (20).", "ai"); return; }
+            if (SecurityChecks.forbiddenRegex.test(rawText)) { addMessage("Sorry, I only answer questions about uploaded documents.", "ai"); DOM.chatInput.value = ''; return; }
 
             DOM.chatInput.value = '';
             AppState.lastMessageTime = now;
@@ -801,54 +616,30 @@
             addMessage(rawText, "user");
             addMessage("loader", "ai");
 
-            const systemPrompt = `You are an AI assistant for the 'UAE Smart Notebook'. 
-RESTRICTION 1: You must ONLY answer questions based on the provided DOCUMENT_TEXT or about the app UI itself.
-RESTRICTION 2: If asked to code, translate, calculate general math, tell jokes, give news, or act as someone else, reply exactly with: "Sorry, I only answer questions about your uploaded documents and this notebook."
-RESTRICTION 3: Keep answers concise and strictly factual.
-
-DOCUMENT_TEXT:
-"""
-${activeDoc.textContext}
-"""`;
+            const systemPrompt = `You are an AI assistant. ONLY answer based on DOCUMENT_TEXT.\nDOCUMENT_TEXT:\n"""${activeDoc.textContext}"""`;
 
             const contents = [];
             const recentHistory = AppState.chatHistory.slice(-4);
             for (const msg of recentHistory) {
-                contents.push({
-                    role: msg.role === 'ai' ? 'model' : 'user',
-                    parts: [{ text: msg.text }]
-                });
+                contents.push({ role: msg.role === 'ai' ? 'model' : 'user', parts: [{ text: msg.text }] });
             }
-            contents.push({
-                role: 'user',
-                parts: [{ text: rawText }]
-            });
+            contents.push({ role: 'user', parts: [{ text: rawText }] });
 
             try {
-                // STRICT MODEL ROUTING
-                // Vercel/Public: Uses user-selected model from Settings
-                // Canvas Preview: gemini-2.5-flash-preview-09-2025 (Uses hidden environment key)
+                // FIX: Use exact stable models without "-latest" suffix to ensure compatibility
                 const activeModel = isVercelEnvironment ? AppState.modelName : 'gemini-2.5-flash-preview-09-2025';
                 const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
                 
                 const response = await fetch(fetchUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        contents: contents
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: contents })
                 });
 
                 const data = await response.json();
                 document.getElementById('temp-loader')?.remove();
 
-                // Advanced HTTP Error Trapping
-                if (!response.ok) {
-                    throw new Error(data.error?.message || `HTTP Error ${response.status}: Failed to reach Google API`);
-                }
-
-                if(data.error) throw new Error(data.error.message || "Unknown API Error");
+                if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);
+                if (data.error) throw new Error(data.error.message || "Unknown Error");
 
                 const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't process that.";
                 
@@ -861,103 +652,35 @@ ${activeDoc.textContext}
                 document.getElementById('temp-loader')?.remove();
                 console.error("API Error: ", err);
                 
-                // Explicit Error logging for Vercel debugging
                 if (err.message.includes("API key not valid") || err.message.includes("API_KEY_INVALID")) {
-                    addMessage("❌ Error: Your API key is invalid. Please check your key in Settings and ensure there are no extra spaces.", "ai");
+                    addMessage("❌ Error: Invalid API key.", "ai");
                     DOM.connStatus.classList.remove('connected');
-                } else if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-                    addMessage("❌ Network Error: Browser blocked the request. This is usually caused by an AdBlocker, a strict VPN, or a regional API restriction blocking access to Google.", "ai");
-                } else if (err.message.includes("not found") || err.message.includes("404")) {
-                    addMessage(`❌ Error: The model is not accessible with this API key tier. Details: ${err.message}`, "ai");
+                } else if (err.message.includes("not found")) {
+                    addMessage(`❌ Error: This Model version is not accessible with your API Key tier. Go to Settings and try switching to a different Model from the dropdown.`, "ai");
                 } else {
-                    addMessage(`❌ AI Connection Error: ${err.message}`, "ai");
+                    addMessage(`❌ Connection Error: ${err.message}`, "ai");
                 }
             }
         }
 
-        function toggleVoice() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert("Voice input is not supported in this browser.");
-                return;
-            }
-
-            if (AppState.isRecording) {
-                recognition?.stop();
-                return;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = () => {
-                AppState.isRecording = true;
-                DOM.micBtn.style.color = 'var(--danger)';
-                DOM.chatInput.placeholder = "Listening...";
-            };
-
-            recognition.onresult = (event) => {
-                DOM.chatInput.value = event.results[0][0].transcript;
-            };
-
-            recognition.onend = () => {
-                AppState.isRecording = false;
-                DOM.micBtn.style.color = 'var(--text-muted)';
-                DOM.chatInput.placeholder = "Ask about your PDF...";
-            };
-
-            recognition.start();
-        }
-
-        // --- Export (JSON & TXT) ---
+        // --- Export & UI Actions ---
         function exportData() {
-            if(!AppState.currentDocId) {
-                alert("No document selected to export.");
-                return;
-            }
+            if(!AppState.currentDocId) return alert("No document selected.");
             const doc = AppState.documents.find(d => d.id === AppState.currentDocId);
             
-            // 1. Export JSON
-            const exportObj = {
-                documentName: doc.name,
-                notes: doc.notes,
-                chatHistory: AppState.chatHistory
-            };
+            const exportObj = { documentName: doc.name, notes: doc.notes, chatHistory: AppState.chatHistory };
             const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-            triggerDownload(jsonStr, "notebook_export.json");
-
-            // 2. Export TXT
-            let txtContent = `DOCUMENT: ${doc.name}\n\n--- NOTES ---\n${doc.notes || 'None'}\n\n--- CHAT HISTORY ---\n`;
-            AppState.chatHistory.forEach(msg => {
-                txtContent += `[${msg.role.toUpperCase()}]: ${msg.text}\n\n`;
-            });
-            const txtStr = "data:text/plain;charset=utf-8," + encodeURIComponent(txtContent);
-            
-            // Small delay so browser allows downloading both files
-            setTimeout(() => triggerDownload(txtStr, "notebook_export.txt"), 500);
+            const a = document.createElement('a'); a.href = jsonStr; a.download = "notebook_export.json"; document.body.appendChild(a); a.click(); a.remove();
         }
 
-        function triggerDownload(dataStr, filename) {
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", filename);
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-
-        // --- Settings Management ---
         function openSettings() {
             DOM.settingsModal.classList.add('active');
             DOM.apiKeyInput.value = AppState.apiKey;
-            DOM.modelSelect.value = AppState.modelName;
+            // Safely set the dropdown value, fallback if empty
+            DOM.modelSelect.value = AppState.modelName || 'gemini-1.5-flash';
         }
 
-        function closeSettings() {
-            DOM.settingsModal.classList.remove('active');
-        }
+        function closeSettings() { DOM.settingsModal.classList.remove('active'); }
 
         function saveApiKey() {
             const key = DOM.apiKeyInput.value.trim();
@@ -968,13 +691,17 @@ ${activeDoc.textContext}
                 localStorage.setItem('gemini_model', AppState.modelName); 
                 DOM.connStatus.classList.add('connected');
                 closeSettings();
-                addMessage("API Key and Model saved securely. System ready.", "ai");
-            } else {
-                alert("Please enter a valid key.");
-            }
+                
+                // Clear chat and notify readiness
+                DOM.chatBox.innerHTML = '';
+                addMessage(`API Key saved securely. Model updated to ${AppState.modelName}. System ready.`, "ai");
+            } else { alert("Please enter a valid key."); }
         }
 
         window.onload = init;
     </script>
 </body>
 </html>
+
+
+```
