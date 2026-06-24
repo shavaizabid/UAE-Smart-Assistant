@@ -327,22 +327,35 @@
         <div class="modal">
             <h2>Settings</h2>
             <div class="modal-form">
-                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.5rem;">
-                    Your AI workspace is currently powered by the securely integrated environment API. No additional API configuration is required.
-                </p>
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button class="btn-primary" style="flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="closeSettings()">Close</button>
-                    <button class="btn-primary" style="flex: 1; background: var(--danger); color: white;" onclick="clearData()">Clear All Data</button>
+                
+                <div>
+                    <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Gemini API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="Enter your API Key (e.g., AIzaSy...)">
                 </div>
+
+                <div>
+                    <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">AI Model</label>
+                    <select id="modelSelect">
+                        <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash Preview</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn-primary" style="flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="closeSettings()">Cancel</button>
+                    <button class="btn-primary" style="flex: 1;" onclick="saveApiKey()">Save API Key</button>
+                </div>
+                
+                <button class="btn-primary" style="width: 100%; background: var(--danger); color: white; margin-top: 0.5rem;" onclick="clearData()">Clear All Data</button>
             </div>
         </div>
     </div>
 
     <script>
-        // API Key is automatically provided by the environment
-        const apiKey = ""; 
-
         const AppState = {
+            apiKey: localStorage.getItem('gemini_api_key') || "",
+            modelName: localStorage.getItem('gemini_model') || "gemini-2.5-flash-preview-09-2025",
             documents: [],
             currentDocId: null,
             chatHistory: [],
@@ -367,7 +380,9 @@
             micBtn: document.getElementById('micBtn'),
             connStatus: document.getElementById('connStatus'),
             msgCount: document.getElementById('msgCount'),
-            settingsModal: document.getElementById('settingsModal')
+            settingsModal: document.getElementById('settingsModal'),
+            apiKeyInput: document.getElementById('apiKeyInput'),
+            modelSelect: document.getElementById('modelSelect')
         };
 
         const SecurityChecks = {
@@ -389,17 +404,18 @@
         }
 
         function init() {
-            DOM.connStatus.classList.add('connected');
+            if (AppState.apiKey || !window.location.protocol.includes("file")) {
+                DOM.connStatus.classList.add('connected');
+            }
         }
 
-        // Fetch wrapper with Exponential Backoff
+        // Fetch wrapper with Exponential Backoff required for the environment
         async function fetchWithBackoff(url, options, maxRetries = 5) {
             const delays = [1000, 2000, 4000, 8000, 16000];
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     const response = await fetch(url, options);
                     if (!response.ok) {
-                        // If it's a client error (e.g., 400 Bad Request), we generally don't want to retry
                         if (response.status >= 400 && response.status < 500 && response.status !== 429) {
                             return response; 
                         }
@@ -526,7 +542,8 @@
             Keep it strictly professional and concise. Do NOT use markdown code blocks, just raw HTML text.`;
 
             try {
-                const model = 'gemini-2.5-flash-preview-09-2025';
+                const apiKey = AppState.apiKey || ""; // Falls back to environment empty string 
+                const model = AppState.modelName;
                 const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
                 const response = await fetchWithBackoff(fetchUrl, {
@@ -552,7 +569,7 @@
             } catch (err) {
                 console.error("Agent Analysis Error: ", err);
                 if (AppState.currentDocId === doc.id) {
-                    DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--danger); font-size: 0.8rem;">Auto-analysis encountered a network error. Try reloading.</span>';
+                    DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--danger); font-size: 0.8rem;">Auto-analysis encountered a network error. Ensure your API Key is configured.</span>';
                 }
             } finally {
                 DOM.connStatus.classList.remove('processing');
@@ -635,7 +652,8 @@
             contents.push({ role: 'user', parts: [{ text: rawText }] });
 
             try {
-                const model = 'gemini-2.5-flash-preview-09-2025';
+                const apiKey = AppState.apiKey || ""; // Falls back to environment empty string 
+                const model = AppState.modelName;
                 const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
                 DOM.connStatus.classList.add('processing');
@@ -663,7 +681,7 @@
                 document.getElementById('temp-loader')?.remove();
                 DOM.connStatus.classList.remove('processing');
                 console.error("API Error: ", err);
-                addMessage(`❌ Connection Error: Ensure you are connected to the network.`, "ai");
+                addMessage(`❌ Connection Error: Ensure your API key is correctly configured in Settings.`, "ai");
             }
         }
 
@@ -694,10 +712,27 @@
         // --- Settings Management ---
         function openSettings() {
             DOM.settingsModal.classList.add('active');
+            DOM.apiKeyInput.value = AppState.apiKey;
+            DOM.modelSelect.value = AppState.modelName || 'gemini-2.5-flash-preview-09-2025';
         }
 
         function closeSettings() { 
             DOM.settingsModal.classList.remove('active'); 
+        }
+
+        function saveApiKey() {
+            const key = DOM.apiKeyInput.value.trim();
+            if (key || !window.location.protocol.includes("file")) { // Allows blank in canvas environment
+                AppState.apiKey = key;
+                AppState.modelName = DOM.modelSelect.value;
+                localStorage.setItem('gemini_api_key', key); 
+                localStorage.setItem('gemini_model', AppState.modelName); 
+                DOM.connStatus.classList.add('connected');
+                closeSettings();
+                showToast("Configuration saved securely. AI Agent ready.", "success");
+            } else { 
+                showToast("Please enter a valid key."); 
+            }
         }
 
         function clearData() {
@@ -706,6 +741,7 @@
             AppState.currentDocId = null;
             AppState.chatHistory = [];
             AppState.messageCount = 0;
+            AppState.apiKey = "";
             
             DOM.chatBox.innerHTML = '<div class="msg msg-ai">Hello! I am your AI Research Assistant. I will autonomously analyze any document you upload. You can also ask me specific questions below.</div>';
             DOM.msgCount.textContent = '0/20 Msgs';
