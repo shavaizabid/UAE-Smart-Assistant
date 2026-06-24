@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UAE Smart Notebook</title>
+    <title>UAE Smart Notebook - Agentic AI Workspace</title>
     <!-- PDF.js CDN for real text extraction -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
@@ -12,7 +12,6 @@
     </script>
     <style>
         :root {
-            var(--bg): #0f1117;
             --bg: #0f1117;
             --card-bg: rgba(22, 27, 34, 0.65);
             --card-solid: #161b22;
@@ -42,7 +41,7 @@
             height: 100vh;
             width: 100vw;
             margin: 0;
-            overflow: hidden; /* For desktop */
+            overflow: hidden; 
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(0, 208, 132, 0.03), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(0, 208, 132, 0.02), transparent 25%);
@@ -73,77 +72,38 @@
             overflow: hidden;
         }
 
-        /* --- Scrollbars --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        /* --- Typography & Elements --- */
         h1, h2, h3, h4 { font-weight: 600; }
         p { line-height: 1.5; }
         
-        button {
-            cursor: pointer;
-            border: none;
-            outline: none;
-            transition: var(--transition);
-            font-weight: 500;
-        }
+        button { cursor: pointer; border: none; outline: none; transition: var(--transition); font-weight: 500; }
 
         .btn-primary {
-            background: var(--accent);
-            color: #000;
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            background: var(--accent); color: #000; padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm); font-size: 0.9rem; display: flex;
+            align-items: center; justify-content: center; gap: 0.5rem;
         }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .btn-icon {
-            background: transparent;
-            color: var(--text-muted);
-            padding: 0.5rem;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .btn-icon { background: transparent; color: var(--text-muted); padding: 0.5rem; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
         .btn-icon:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
 
-        input, textarea, select {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
-            outline: none;
-            transition: var(--transition);
-            width: 100%;
-        }
+        input, textarea, select { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: var(--radius-sm); outline: none; transition: var(--transition); width: 100%; }
         select option { background: var(--card-solid); color: var(--text-main); }
         input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
         /* --- Left Sidebar --- */
         .left-sidebar { padding: 1.5rem; }
         .brand { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
-        .brand-icon {
-            width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            color: #000; font-weight: bold; font-size: 1.2rem;
-        }
+        .brand-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 1.2rem; }
         .search-box { margin-bottom: 1.5rem; position: relative; }
         .doc-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; min-height: 0; }
-        .doc-item {
-            padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid transparent;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: var(--transition);
-        }
+        .doc-item { padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: var(--transition); }
         .doc-item:hover { background: rgba(255,255,255,0.03); }
         .doc-item.active { background: rgba(0, 208, 132, 0.1); border-color: rgba(0, 208, 132, 0.3); }
         .doc-info { display: flex; flex-direction: column; gap: 0.2rem; overflow: hidden; }
@@ -152,21 +112,20 @@
         .sidebar-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 1rem; }
 
         /* --- Center Workspace --- */
-        .workspace-header {
-            padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .workspace-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .workspace-content { flex: 1; display: flex; overflow: hidden; position: relative; min-height: 0; }
         .pdf-container { flex: 2; height: 100%; border-right: 1px solid var(--border-color); background: #2a2a2a; position: relative; }
-        .empty-state {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--text-muted); gap: 1rem;
-        }
+        .empty-state { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); gap: 1rem; }
         
-        .smart-panel { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; min-width: 300px; }
+        .smart-panel { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; min-width: 320px; }
         .smart-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; }
-        .smart-card h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .smart-card h3 { font-size: 0.85rem; color: var(--accent); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem;}
+        
+        /* Agentic Summary Styling */
+        .agentic-summary { font-size: 0.9rem; color: var(--text-main); line-height: 1.5; }
+        .agentic-summary ul { margin-left: 1.2rem; margin-top: 0.5rem; color: var(--text-muted); }
+        .agentic-summary li { margin-bottom: 0.3rem; }
+        
         .data-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; align-items: center;}
         .data-label { color: var(--text-muted); }
         .data-value { font-weight: 500; text-align: right; }
@@ -176,7 +135,7 @@
         .tag-orange { background: rgba(250, 173, 20, 0.2); color: var(--warning); }
         .tag-red { background: rgba(255, 77, 79, 0.2); color: var(--danger); }
 
-        .notes-area { flex: 1; display: flex; flex-direction: column; }
+        .notes-area { flex: 1; display: flex; flex-direction: column; min-height: 150px; }
         .notes-area textarea { flex: 1; resize: none; background: #fff8dc11; border: 1px dashed var(--border-color); font-family: 'Courier New', Courier, monospace; }
 
         /* --- Right Sidebar (AI Chat) --- */
@@ -184,8 +143,10 @@
         .token-indicator { font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
         .status-dot.connected { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .status-dot.processing { background: var(--warning); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; box-shadow: 0 0 8px var(--warning); } 100% { opacity: 0.5; } }
         
-        .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; min-height: 0; }
+        .chat-messages { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; min-height: 0; scroll-behavior: smooth;}
         .msg { max-width: 85%; padding: 0.85rem 1.1rem; border-radius: 14px; font-size: 0.95rem; line-height: 1.4; animation: fadeIn 0.3s ease; word-wrap: break-word; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .msg-user { background: rgba(0, 208, 132, 0.15); border: 1px solid rgba(0, 208, 132, 0.3); align-self: flex-end; border-bottom-right-radius: 4px; }
@@ -208,35 +169,21 @@
         .modal h2 { margin-bottom: 1.5rem; }
         .modal-form { display: flex; flex-direction: column; gap: 1rem; }
 
-        /* --- FIX: STRONG RESPONSIVE MOBILE & TABLET LAYOUT --- */
+        /* --- RESPONSIVE MOBILE & TABLET LAYOUT --- */
         @media (max-width: 1200px) {
             .app-container { grid-template-columns: 240px 1fr; }
-            .smart-panel { display: none; } /* Hide extra panel on medium screens */
+            .smart-panel { display: none; } 
         }
         
         @media (max-width: 900px) {
-            /* On phones, completely ditch the grid and use flex stacking with scrolling */
-            body { 
-                overflow-y: auto; 
-                height: auto; 
-                min-height: 100vh; 
-            }
-            .app-container { 
-                display: flex; 
-                flex-direction: column; 
-                height: auto; 
-                padding: 0.75rem;
-                gap: 1rem;
-            }
+            body { overflow-y: auto; height: auto; min-height: 100vh; }
+            .app-container { display: flex; flex-direction: column; height: auto; padding: 0.75rem; gap: 1rem; }
             .glass-panel { border-radius: 12px; }
-            
             .left-sidebar { min-height: 250px; flex: none; }
-            
             .center-workspace { min-height: 50vh; display: flex; flex-direction: column; }
             .workspace-content { flex-direction: column; min-height: 400px; }
             .pdf-container { width: 100%; height: 400px; border-right: none; border-bottom: 1px solid var(--border-color); }
-            .smart-panel { width: 100%; display: flex; }
-            
+            .smart-panel { width: 100%; display: flex; min-height: auto; }
             .right-sidebar { min-height: 600px; display: flex; flex-direction: column; }
         }
         
@@ -307,17 +254,26 @@
 
                 <!-- Smart Details & Notes -->
                 <div class="smart-panel" id="smartPanel">
+                    
+                    <!-- NEW: Agentic AI Workflow Component -->
+                    <div class="smart-card" id="agenticSummaryCard">
+                        <h3>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Autonomous AI Analysis
+                        </h3>
+                        <div id="agenticSummaryContent" class="agentic-summary">
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">Awaiting document for autonomous review...</span>
+                        </div>
+                    </div>
+
                     <div class="smart-card">
-                        <h3>Important Dates</h3>
+                        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:0.5rem;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Detected Dates</h3>
                         <div id="datesContainer"><div class="data-row"><span class="data-label">No document</span></div></div>
                     </div>
-                    <div class="smart-card">
-                        <h3>Financial Details</h3>
-                        <div id="financialContainer"><div class="data-row"><span class="data-label">No data</span></div></div>
-                    </div>
+
                     <div class="notes-area">
                         <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">STICKY NOTES</h3>
-                        <textarea id="stickyNotes" placeholder="Jot down quick thoughts here..." oninput="saveNotes()"></textarea>
+                        <textarea id="stickyNotes" placeholder="Jot down quick thoughts here... (Auto-saves)" oninput="saveNotes()"></textarea>
                     </div>
                 </div>
             </div>
@@ -328,7 +284,7 @@
             <div class="chat-header">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <div class="brand-icon" style="width: 24px; height: 24px; font-size: 0.8rem; border-radius: 6px;">AI</div>
-                    <h3 style="font-size: 1rem;">Assistant</h3>
+                    <h3 style="font-size: 1rem;">Research Assistant</h3>
                 </div>
                 <div class="token-indicator">
                     <span id="connStatus" class="status-dot"></span>
@@ -337,18 +293,18 @@
             </div>
 
             <div class="chat-messages" id="chatBox">
-                <div class="msg msg-ai">Hello! Connect your API key in Settings, upload a document, and ask me anything about it.</div>
+                <div class="msg msg-ai">Hello! I am your AI Research Assistant. I will autonomously analyze any document you upload. You can also ask me specific questions below.</div>
             </div>
 
             <div class="chat-input-area">
                 <div class="chips" id="suggestedChips">
-                    <div class="chip" onclick="setQuery('Summarize this document')">Summarize</div>
-                    <div class="chip" onclick="setQuery('What are the key dates?')">Key Dates</div>
-                    <div class="chip" onclick="setQuery('List financial obligations')">Financials</div>
+                    <div class="chip" onclick="setQuery('What are my main obligations?')">Key Obligations</div>
+                    <div class="chip" onclick="setQuery('Are there any hidden fees?')">Hidden Fees?</div>
+                    <div class="chip" onclick="setQuery('Summarize in 3 bullet points')">Quick Summary</div>
                 </div>
                 
                 <div class="input-group">
-                    <input type="text" id="chatInput" placeholder="Ask about your PDF..." maxlength="300" onkeypress="handleEnter(event)">
+                    <input type="text" id="chatInput" placeholder="Ask about your document..." maxlength="300" onkeypress="handleEnter(event)">
                     <div class="input-actions">
                         <button class="btn-icon" id="micBtn" onclick="toggleVoice()" title="Voice Input">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
@@ -375,7 +331,6 @@
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">AI Model Version</label>
                     <select id="modelSelect">
-                        <!-- FIX: Safest Google Cloud AI Studio model names -->
                         <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable & Safe) - Default</option>
                         <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fast)</option>
                         <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
@@ -390,10 +345,8 @@
     </div>
 
     <script>
-        // Check for injected environment
         const isVercelEnvironment = typeof apiKey === 'undefined';
 
-        // Fix: Default to stable 'gemini-1.5-flash' without '-latest' 
         const AppState = {
             apiKey: localStorage.getItem('gemini_api_key') || '',
             modelName: localStorage.getItem('gemini_model') || 'gemini-1.5-flash',
@@ -413,7 +366,7 @@
             pdfEmptyState: document.getElementById('pdfEmptyState'),
             currentDocTitle: document.getElementById('currentDocTitle'),
             datesContainer: document.getElementById('datesContainer'),
-            financialContainer: document.getElementById('financialContainer'),
+            agenticSummaryContent: document.getElementById('agenticSummaryContent'),
             stickyNotes: document.getElementById('stickyNotes'),
             chatBox: document.getElementById('chatBox'),
             chatInput: document.getElementById('chatInput'),
@@ -445,7 +398,7 @@
             if (!file) return;
 
             const docId = 'doc_' + Date.now();
-            DOM.currentDocTitle.textContent = "Extracting text... Please wait.";
+            DOM.currentDocTitle.textContent = "Processing Document... Please wait.";
 
             try {
                 const dataUrl = await new Promise((resolve) => {
@@ -468,7 +421,8 @@
                 const newDoc = {
                     id: docId, name: file.name, date: new Date().toLocaleDateString(),
                     fileUrl: dataUrl, textContext: fullText || "No readable text found.",
-                    notes: localStorage.getItem(`notes_${docId}`) || ''
+                    notes: localStorage.getItem(`notes_${docId}`) || '',
+                    aiSummary: localStorage.getItem(`summary_${docId}`) || null // Store Agentic output
                 };
 
                 AppState.documents.push(newDoc);
@@ -477,7 +431,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Failed to read the text from this PDF. It might be corrupted or image-only.");
+                alert("Failed to read PDF.");
                 DOM.currentDocTitle.textContent = "Workspace";
             }
             this.value = '';
@@ -485,9 +439,7 @@
 
         function renderDocList() {
             if (AppState.documents.length === 0) {
-                DOM.docList.innerHTML = '';
-                DOM.docList.appendChild(DOM.docEmptyState);
-                return;
+                DOM.docList.innerHTML = ''; DOM.docList.appendChild(DOM.docEmptyState); return;
             }
             DOM.docList.innerHTML = '';
             AppState.documents.forEach(doc => {
@@ -510,7 +462,17 @@
                 
                 const savedNotes = localStorage.getItem(`notes_${doc.id}`);
                 DOM.stickyNotes.value = savedNotes !== null ? savedNotes : doc.notes;
-                analyzeSmartData(doc.textContext);
+                
+                analyzeSmartDataRegex(doc.textContext);
+                
+                // --- AGENTIC WORKFLOW TRIGGER ---
+                // If the document hasn't been summarized by the AI Agent yet, trigger it autonomously.
+                if (doc.aiSummary) {
+                    DOM.agenticSummaryContent.innerHTML = doc.aiSummary;
+                } else {
+                    DOM.agenticSummaryContent.innerHTML = '<span class="loader" style="width:12px;height:12px;"></span> Analyzing...';
+                    triggerAgenticAnalysis(doc);
+                }
             }
             renderDocList();
         }
@@ -518,6 +480,7 @@
         function deleteCurrentDoc() {
             if(!AppState.currentDocId) return;
             localStorage.removeItem(`notes_${AppState.currentDocId}`);
+            localStorage.removeItem(`summary_${AppState.currentDocId}`);
             AppState.documents = AppState.documents.filter(d => d.id !== AppState.currentDocId);
             
             if(AppState.documents.length > 0) { selectDocument(AppState.documents[0].id); } 
@@ -529,31 +492,76 @@
                 DOM.pdfViewer.src = '';
                 DOM.stickyNotes.value = '';
                 DOM.datesContainer.innerHTML = '<div class="data-row"><span class="data-label">No document loaded</span></div>';
-                DOM.financialContainer.innerHTML = '<div class="data-row"><span class="data-label">No data</span></div>';
+                DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--text-muted); font-size: 0.8rem;">Awaiting document...</span>';
             }
             renderDocList();
         }
 
-        function analyzeSmartData(text) {
+        // --- AGENTIC AI WORKFLOW ---
+        // This function runs autonomously in the background without user prompt
+        async function triggerAgenticAnalysis(doc) {
+            const activeKey = isVercelEnvironment ? AppState.apiKey : '';
+            if(!activeKey) {
+                DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--warning); font-size: 0.8rem;">Connect API Key to enable Auto-Analysis.</span>';
+                return;
+            }
+
+            DOM.connStatus.classList.add('processing');
+
+            const systemPrompt = `You are an autonomous Document Analysis Agent. 
+            Analyze the following document and return HTML formatted output.
+            1. Write a 1-2 sentence executive summary.
+            2. Create a bulleted <ul> list of exactly 3 critical obligations or key takeaways.
+            Keep it strictly professional and concise. Do NOT use markdown code blocks, just raw HTML text.`;
+
+            try {
+                const activeModel = isVercelEnvironment ? AppState.modelName : 'gemini-2.5-flash-preview-09-2025';
+                const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+                
+                const response = await fetch(fetchUrl, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        contents: [{ role: 'user', parts: [{ text: `DOCUMENT_TEXT: ${doc.textContext.substring(0, 8000)}` }] }]
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok || data.error) throw new Error("Agentic flow failed.");
+
+                let summaryHtml = data.candidates?.[0]?.content?.parts?.[0]?.text || "Analysis complete. No key insights found.";
+                summaryHtml = summaryHtml.replace(/```html|```/g, ''); // Clean markdown if AI accidentally includes it
+
+                // Save state autonomously
+                doc.aiSummary = summaryHtml;
+                localStorage.setItem(`summary_${doc.id}`, summaryHtml);
+                
+                // Update UI only if the user is still looking at the same document
+                if (AppState.currentDocId === doc.id) {
+                    DOM.agenticSummaryContent.innerHTML = summaryHtml;
+                }
+            } catch (err) {
+                console.error("Agent Analysis Error: ", err);
+                if (AppState.currentDocId === doc.id) {
+                    DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--danger); font-size: 0.8rem;">Auto-analysis failed. Check API key.</span>';
+                }
+            } finally {
+                DOM.connStatus.classList.remove('processing');
+            }
+        }
+
+        // --- Fast Regex Extraction ---
+        function analyzeSmartDataRegex(text) {
             const dateMatches = text.match(/\d{2}\/\d{2}\/\d{4}/g) || [];
             let datesHtml = '';
             if(dateMatches.length > 0) {
-                [...new Set(dateMatches)].forEach((dateStr, i) => {
+                [...new Set(dateMatches)].slice(0, 3).forEach((dateStr, i) => {
                     const diffDays = getDays(dateStr);
                     const tag = diffDays > 30 ? `tag-green">${diffDays}d left` : diffDays > 7 ? `tag-orange">${diffDays}d left` : `tag-red">${diffDays > 0 ? diffDays+'d left' : 'Expired'}`;
-                    datesHtml += `<div class="data-row"><span class="data-label">${i===0?"Primary Date":"Date"}</span><span class="data-value" style="display:flex;gap:0.5rem;align-items:center;">${dateStr} <span class="tag ${tag}</span></span></div>`;
+                    datesHtml += `<div class="data-row"><span class="data-label">Date Detected</span><span class="data-value" style="display:flex;gap:0.5rem;align-items:center;">${dateStr} <span class="tag ${tag}</span></span></div>`;
                 });
             } else { datesHtml = '<div class="data-row"><span class="data-label">No dates found</span></div>'; }
             DOM.datesContainer.innerHTML = datesHtml;
-
-            const aedMatches = text.match(/AED\s[\d,.]+/g) || text.match(/[\d,.]+\sAED/g) || [];
-            let finHtml = '';
-            if(aedMatches.length > 0) {
-                [...new Set(aedMatches)].forEach((amt, i) => {
-                    finHtml += `<div class="data-row"><span class="data-label">${i===0?"Primary Amount":"Other"}</span><span class="data-value" style="color: var(--accent);">${amt}</span></div>`;
-                });
-            } else { finHtml = '<div class="data-row"><span class="data-label">No amounts found</span></div>'; }
-            DOM.financialContainer.innerHTML = finHtml;
         }
 
         function getDays(dateStr) {
@@ -592,21 +600,16 @@
             if (!rawText) return;
 
             const activeKey = isVercelEnvironment ? AppState.apiKey : '';
-            if(isVercelEnvironment && !activeKey) {
-                addMessage("Please connect your Gemini API key in settings first.", "ai");
-                setTimeout(openSettings, 1500); return;
-            }
+            if(isVercelEnvironment && !activeKey) { addMessage("Connect your API key in settings first.", "ai"); setTimeout(openSettings, 1500); return; }
 
             const activeDoc = AppState.documents.find(d => d.id === AppState.currentDocId);
-            if(!activeDoc) {
-                addMessage("Please upload and select a PDF document first!", "ai"); return;
-            }
+            if(!activeDoc) { addMessage("Upload and select a PDF document first!", "ai"); return; }
 
-            if (rawText.length > SecurityChecks.maxLength) { addMessage("Limit to 300 characters.", "ai"); return; }
+            if (rawText.length > SecurityChecks.maxLength) { addMessage("Limit to 300 chars.", "ai"); return; }
             const now = Date.now();
             if (now - AppState.lastMessageTime < SecurityChecks.cooldownMs) { addMessage("Wait a few seconds.", "ai"); return; }
             if (AppState.messageCount >= SecurityChecks.maxMessages) { addMessage("Session limit reached (20).", "ai"); return; }
-            if (SecurityChecks.forbiddenRegex.test(rawText)) { addMessage("Sorry, I only answer questions about uploaded documents.", "ai"); DOM.chatInput.value = ''; return; }
+            if (SecurityChecks.forbiddenRegex.test(rawText)) { addMessage("I only answer questions about documents.", "ai"); DOM.chatInput.value = ''; return; }
 
             DOM.chatInput.value = '';
             AppState.lastMessageTime = now;
@@ -616,7 +619,7 @@
             addMessage(rawText, "user");
             addMessage("loader", "ai");
 
-            const systemPrompt = `You are an AI assistant. ONLY answer based on DOCUMENT_TEXT.\nDOCUMENT_TEXT:\n"""${activeDoc.textContext}"""`;
+            const systemPrompt = `You are a strict, highly accurate Research Assistant. ONLY answer based on DOCUMENT_TEXT.\nDOCUMENT_TEXT:\n"""${activeDoc.textContext.substring(0, 15000)}"""`;
 
             const contents = [];
             const recentHistory = AppState.chatHistory.slice(-4);
@@ -626,10 +629,11 @@
             contents.push({ role: 'user', parts: [{ text: rawText }] });
 
             try {
-                // FIX: Use exact stable models without "-latest" suffix to ensure compatibility
                 const activeModel = isVercelEnvironment ? AppState.modelName : 'gemini-2.5-flash-preview-09-2025';
                 const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
                 
+                DOM.connStatus.classList.add('processing');
+
                 const response = await fetch(fetchUrl, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: contents })
@@ -637,6 +641,7 @@
 
                 const data = await response.json();
                 document.getElementById('temp-loader')?.remove();
+                DOM.connStatus.classList.remove('processing');
 
                 if (!response.ok) throw new Error(data.error?.message || `HTTP ${response.status}`);
                 if (data.error) throw new Error(data.error.message || "Unknown Error");
@@ -650,33 +655,44 @@
 
             } catch (err) {
                 document.getElementById('temp-loader')?.remove();
+                DOM.connStatus.classList.remove('processing');
                 console.error("API Error: ", err);
                 
-                if (err.message.includes("API key not valid") || err.message.includes("API_KEY_INVALID")) {
-                    addMessage("❌ Error: Invalid API key.", "ai");
-                    DOM.connStatus.classList.remove('connected');
-                } else if (err.message.includes("not found")) {
-                    addMessage(`❌ Error: This Model version is not accessible with your API Key tier. Go to Settings and try switching to a different Model from the dropdown.`, "ai");
+                if (err.message.includes("API key not valid")) {
+                    addMessage("❌ Error: Invalid API key.", "ai"); DOM.connStatus.classList.remove('connected');
                 } else {
-                    addMessage(`❌ Connection Error: ${err.message}`, "ai");
+                    addMessage(`❌ Connection Error: Ensure Model matches API permissions.`, "ai");
                 }
             }
         }
 
-        // --- Export & UI Actions ---
+        // --- Voice & Export ---
+        function toggleVoice() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return alert("Voice input not supported in this browser.");
+            if (AppState.isRecording) { recognition?.stop(); return; }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
+
+            recognition.onstart = () => { AppState.isRecording = true; DOM.micBtn.style.color = 'var(--danger)'; DOM.chatInput.placeholder = "Listening..."; };
+            recognition.onresult = (event) => { DOM.chatInput.value = event.results[0][0].transcript; };
+            recognition.onend = () => { AppState.isRecording = false; DOM.micBtn.style.color = 'var(--text-muted)'; DOM.chatInput.placeholder = "Ask about your PDF..."; };
+            recognition.start();
+        }
+
         function exportData() {
             if(!AppState.currentDocId) return alert("No document selected.");
             const doc = AppState.documents.find(d => d.id === AppState.currentDocId);
-            
-            const exportObj = { documentName: doc.name, notes: doc.notes, chatHistory: AppState.chatHistory };
+            const exportObj = { documentName: doc.name, autoSummary: doc.aiSummary, notes: doc.notes, chatHistory: AppState.chatHistory };
             const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-            const a = document.createElement('a'); a.href = jsonStr; a.download = "notebook_export.json"; document.body.appendChild(a); a.click(); a.remove();
+            const a = document.createElement('a'); a.href = jsonStr; a.download = "research_export.json"; document.body.appendChild(a); a.click(); a.remove();
         }
 
+        // --- Settings Management ---
         function openSettings() {
             DOM.settingsModal.classList.add('active');
             DOM.apiKeyInput.value = AppState.apiKey;
-            // Safely set the dropdown value, fallback if empty
             DOM.modelSelect.value = AppState.modelName || 'gemini-1.5-flash';
         }
 
@@ -691,10 +707,8 @@
                 localStorage.setItem('gemini_model', AppState.modelName); 
                 DOM.connStatus.classList.add('connected');
                 closeSettings();
-                
-                // Clear chat and notify readiness
                 DOM.chatBox.innerHTML = '';
-                addMessage(`API Key saved securely. Model updated to ${AppState.modelName}. System ready.`, "ai");
+                addMessage(`Configuration saved securely. AI Agent ready.`, "ai");
             } else { alert("Please enter a valid key."); }
         }
 
