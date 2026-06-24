@@ -189,6 +189,11 @@
         .hidden { display: none !important; }
         .loader { width: 16px; height: 16px; border: 2px solid var(--text-muted); border-bottom-color: var(--accent); border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Toast Notification */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.9rem; transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
+        .toast.success { background: var(--accent); color: #000; }
+        .toast.error { background: var(--danger); color: #fff; }
     </style>
 </head>
 <body>
@@ -322,33 +327,22 @@
         <div class="modal">
             <h2>Settings</h2>
             <div class="modal-form">
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Gemini API Key</label>
-                    <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">For Vercel/GitHub pages, enter your free Google AI Studio API key.</p>
-                </div>
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">AI Model Version</label>
-                    <select id="modelSelect">
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable & Safe) - Default</option>
-                        <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash 8B (Fast)</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
-                    </select>
-                </div>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="btn-primary" style="flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="closeSettings()">Cancel</button>
-                    <button class="btn-primary" style="flex: 1;" onclick="saveApiKey()">Save & Connect</button>
+                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.5rem;">
+                    Your AI workspace is currently powered by the securely integrated environment API. No additional API configuration is required.
+                </p>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn-primary" style="flex: 1; background: transparent; border: 1px solid var(--border-color); color: var(--text-main);" onclick="closeSettings()">Close</button>
+                    <button class="btn-primary" style="flex: 1; background: var(--danger); color: white;" onclick="clearData()">Clear All Data</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const isVercelEnvironment = typeof apiKey === 'undefined';
+        // API Key is automatically provided by the environment
+        const apiKey = ""; 
 
         const AppState = {
-            apiKey: localStorage.getItem('gemini_api_key') || '',
-            modelName: localStorage.getItem('gemini_model') || 'gemini-1.5-flash',
             documents: [],
             currentDocId: null,
             chatHistory: [],
@@ -373,9 +367,7 @@
             micBtn: document.getElementById('micBtn'),
             connStatus: document.getElementById('connStatus'),
             msgCount: document.getElementById('msgCount'),
-            settingsModal: document.getElementById('settingsModal'),
-            apiKeyInput: document.getElementById('apiKeyInput'),
-            modelSelect: document.getElementById('modelSelect')
+            settingsModal: document.getElementById('settingsModal')
         };
 
         const SecurityChecks = {
@@ -383,12 +375,41 @@
             maxMessages: 20, cooldownMs: 3000, maxLength: 300
         };
 
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.style.opacity = '1', 10);
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                setTimeout(() => toast.remove(), 300); 
+            }, 3000);
+        }
+
         function init() {
-            const activeKey = isVercelEnvironment ? AppState.apiKey : '';
-            if(isVercelEnvironment && !activeKey) {
-                setTimeout(openSettings, 1000);
-            } else {
-                DOM.connStatus.classList.add('connected');
+            DOM.connStatus.classList.add('connected');
+        }
+
+        // Fetch wrapper with Exponential Backoff
+        async function fetchWithBackoff(url, options, maxRetries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        // If it's a client error (e.g., 400 Bad Request), we generally don't want to retry
+                        if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+                            return response; 
+                        }
+                        throw new Error(`HTTP Error ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
             }
         }
 
@@ -421,7 +442,7 @@
                     id: docId, name: file.name, date: new Date().toLocaleDateString(),
                     fileUrl: dataUrl, textContext: fullText || "No readable text found.",
                     notes: localStorage.getItem(`notes_${docId}`) || '',
-                    aiSummary: localStorage.getItem(`summary_${docId}`) || null // Store Agentic output
+                    aiSummary: localStorage.getItem(`summary_${docId}`) || null
                 };
 
                 AppState.documents.push(newDoc);
@@ -430,7 +451,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Failed to read PDF.");
+                showToast("Failed to read the PDF file.", "error");
                 DOM.currentDocTitle.textContent = "Workspace";
             }
             this.value = '';
@@ -464,8 +485,6 @@
                 
                 analyzeSmartDataRegex(doc.textContext);
                 
-                // --- AGENTIC WORKFLOW TRIGGER ---
-                // If the document hasn't been summarized by the AI Agent yet, trigger it autonomously.
                 if (doc.aiSummary) {
                     DOM.agenticSummaryContent.innerHTML = doc.aiSummary;
                 } else {
@@ -497,14 +516,7 @@
         }
 
         // --- AGENTIC AI WORKFLOW ---
-        // This function runs autonomously in the background without user prompt
         async function triggerAgenticAnalysis(doc) {
-            const activeKey = isVercelEnvironment ? AppState.apiKey : '';
-            if(!activeKey) {
-                DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--warning); font-size: 0.8rem;">Connect API Key to enable Auto-Analysis.</span>';
-                return;
-            }
-
             DOM.connStatus.classList.add('processing');
 
             const systemPrompt = `You are an autonomous Document Analysis Agent. 
@@ -514,10 +526,10 @@
             Keep it strictly professional and concise. Do NOT use markdown code blocks, just raw HTML text.`;
 
             try {
-                const activeModel = isVercelEnvironment ? AppState.modelName : 'gemini-2.5-flash-preview-09-2025';
-                const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+                const model = 'gemini-2.5-flash-preview-09-2025';
+                const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
-                const response = await fetch(fetchUrl, {
+                const response = await fetchWithBackoff(fetchUrl, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -529,20 +541,18 @@
                 if (!response.ok || data.error) throw new Error("Agentic flow failed.");
 
                 let summaryHtml = data.candidates?.[0]?.content?.parts?.[0]?.text || "Analysis complete. No key insights found.";
-                summaryHtml = summaryHtml.replace(/```html|```/g, ''); // Clean markdown if AI accidentally includes it
+                summaryHtml = summaryHtml.replace(/```html|```/g, ''); 
 
-                // Save state autonomously
                 doc.aiSummary = summaryHtml;
                 localStorage.setItem(`summary_${doc.id}`, summaryHtml);
                 
-                // Update UI only if the user is still looking at the same document
                 if (AppState.currentDocId === doc.id) {
                     DOM.agenticSummaryContent.innerHTML = summaryHtml;
                 }
             } catch (err) {
                 console.error("Agent Analysis Error: ", err);
                 if (AppState.currentDocId === doc.id) {
-                    DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--danger); font-size: 0.8rem;">Auto-analysis failed. Check API key.</span>';
+                    DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--danger); font-size: 0.8rem;">Auto-analysis encountered a network error. Try reloading.</span>';
                 }
             } finally {
                 DOM.connStatus.classList.remove('processing');
@@ -598,9 +608,6 @@
             const rawText = DOM.chatInput.value.trim();
             if (!rawText) return;
 
-            const activeKey = isVercelEnvironment ? AppState.apiKey : '';
-            if(isVercelEnvironment && !activeKey) { addMessage("Connect your API key in settings first.", "ai"); setTimeout(openSettings, 1500); return; }
-
             const activeDoc = AppState.documents.find(d => d.id === AppState.currentDocId);
             if(!activeDoc) { addMessage("Upload and select a PDF document first!", "ai"); return; }
 
@@ -628,12 +635,12 @@
             contents.push({ role: 'user', parts: [{ text: rawText }] });
 
             try {
-                const activeModel = isVercelEnvironment ? AppState.modelName : 'gemini-2.5-flash-preview-09-2025';
-                const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+                const model = 'gemini-2.5-flash-preview-09-2025';
+                const fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 
                 DOM.connStatus.classList.add('processing');
 
-                const response = await fetch(fetchUrl, {
+                const response = await fetchWithBackoff(fetchUrl, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: contents })
                 });
@@ -656,18 +663,14 @@
                 document.getElementById('temp-loader')?.remove();
                 DOM.connStatus.classList.remove('processing');
                 console.error("API Error: ", err);
-                
-                if (err.message.includes("API key not valid")) {
-                    addMessage("❌ Error: Invalid API key.", "ai"); DOM.connStatus.classList.remove('connected');
-                } else {
-                    addMessage(`❌ Connection Error: Ensure Model matches API permissions.`, "ai");
-                }
+                addMessage(`❌ Connection Error: Ensure you are connected to the network.`, "ai");
             }
         }
 
         // --- Voice & Export ---
+        let recognition;
         function toggleVoice() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return alert("Voice input not supported in this browser.");
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return showToast("Voice input not supported in this browser.");
             if (AppState.isRecording) { recognition?.stop(); return; }
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -681,7 +684,7 @@
         }
 
         function exportData() {
-            if(!AppState.currentDocId) return alert("No document selected.");
+            if(!AppState.currentDocId) return showToast("No document selected.");
             const doc = AppState.documents.find(d => d.id === AppState.currentDocId);
             const exportObj = { documentName: doc.name, autoSummary: doc.aiSummary, notes: doc.notes, chatHistory: AppState.chatHistory };
             const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
@@ -691,24 +694,33 @@
         // --- Settings Management ---
         function openSettings() {
             DOM.settingsModal.classList.add('active');
-            DOM.apiKeyInput.value = AppState.apiKey;
-            DOM.modelSelect.value = AppState.modelName || 'gemini-1.5-flash';
         }
 
-        function closeSettings() { DOM.settingsModal.classList.remove('active'); }
+        function closeSettings() { 
+            DOM.settingsModal.classList.remove('active'); 
+        }
 
-        function saveApiKey() {
-            const key = DOM.apiKeyInput.value.trim();
-            if(key) {
-                AppState.apiKey = key;
-                AppState.modelName = DOM.modelSelect.value;
-                localStorage.setItem('gemini_api_key', key); 
-                localStorage.setItem('gemini_model', AppState.modelName); 
-                DOM.connStatus.classList.add('connected');
-                closeSettings();
-                DOM.chatBox.innerHTML = '';
-                addMessage(`Configuration saved securely. AI Agent ready.`, "ai");
-            } else { alert("Please enter a valid key."); }
+        function clearData() {
+            localStorage.clear();
+            AppState.documents = [];
+            AppState.currentDocId = null;
+            AppState.chatHistory = [];
+            AppState.messageCount = 0;
+            
+            DOM.chatBox.innerHTML = '<div class="msg msg-ai">Hello! I am your AI Research Assistant. I will autonomously analyze any document you upload. You can also ask me specific questions below.</div>';
+            DOM.msgCount.textContent = '0/20 Msgs';
+            
+            DOM.currentDocTitle.textContent = 'Workspace';
+            DOM.pdfEmptyState.classList.remove('hidden');
+            DOM.pdfViewer.classList.add('hidden');
+            DOM.pdfViewer.src = '';
+            DOM.stickyNotes.value = '';
+            DOM.datesContainer.innerHTML = '<div class="data-row"><span class="data-label">No document loaded</span></div>';
+            DOM.agenticSummaryContent.innerHTML = '<span style="color: var(--text-muted); font-size: 0.8rem;">Awaiting document...</span>';
+            
+            renderDocList();
+            closeSettings();
+            showToast('All local data cleared successfully.', 'success');
         }
 
         window.onload = init;
